@@ -324,14 +324,16 @@ export const buildAgentGraph = async ({
                         let approveButtonText = 'Yes'
                         let rejectButtonText = 'No'
 
+                        let loginLink = "http://192.168.2.3:10000/login?state=" + sessionId
+
                         if (connectedToolNode || node) {
                             if (connectedToolNode) {
-                                const result = await connectedToolNode.data.instance.node.seekPermissionMessage(mappedToolCalls)
+                                const result = await connectedToolNode.data.instance.node.seekPermissionMessage(mappedToolCalls, loginLink)
                                 finalResult = result || 'Do you want to proceed?'
                                 approveButtonText = connectedToolNode.data.inputs?.approveButtonText || 'Yes'
                                 rejectButtonText = connectedToolNode.data.inputs?.rejectButtonText || 'No'
                             } else if (node) {
-                                const result = await node.data.instance.agentInterruptToolNode.seekPermissionMessage(mappedToolCalls)
+                                const result = await node.data.instance.agentInterruptToolNode.seekPermissionMessage(mappedToolCalls, loginLink)
                                 finalResult = result || 'Do you want to proceed?'
                                 approveButtonText = node.data.inputs?.approveButtonText || 'Yes'
                                 rejectButtonText = node.data.inputs?.rejectButtonText || 'No'

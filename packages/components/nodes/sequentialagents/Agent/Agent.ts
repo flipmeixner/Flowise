@@ -468,7 +468,8 @@ class Agent_SeqAgents implements INode {
         const model = nodeData.inputs?.model as BaseChatModel
         const promptValuesStr = nodeData.inputs?.promptValues
         const output = nodeData.outputs?.output as string
-        const approvalPrompt = nodeData.inputs?.approvalPrompt as string
+        let approvalPrompt = nodeData.inputs?.approvalPrompt as string
+        approvalPrompt = transformBracesWithColon(approvalPrompt)
 
         if (!agentLabel) throw new Error('Agent name is required!')
         const agentName = agentLabel.toLowerCase().replace(/\s/g, '_').trim()
@@ -502,16 +503,17 @@ class Agent_SeqAgents implements INode {
         const toolName = `tool_${nodeData.id}`
         const toolNode = new ToolNode(tools, nodeData, input, options, toolName, [], { sequentialNodeName: toolName })
 
-        ;(toolNode as any).seekPermissionMessage = async (usedTools: IUsedTool[]) => {
-            const prompt = ChatPromptTemplate.fromMessages([['human', approvalPrompt || defaultApprovalPrompt]])
+        ;(toolNode as any).seekPermissionMessage = async (usedTools: IUsedTool[], loginLink: string) => {        
+            const prompt = ChatPromptTemplate.fromMessages([['human', approvalPrompt + loginLink || defaultApprovalPrompt]])
             const chain = prompt.pipe(startLLM)
             const response = (await chain.invoke({
-                input: 'Hello there!',
+                input: prompt,
                 tools: JSON.stringify(usedTools)
             })) as AIMessageChunk
+        
             return response.content
         }
-
+        
         const workerNode = async (state: ISeqAgentsState, config: RunnableConfig) => {
             return await agentNode(
                 {

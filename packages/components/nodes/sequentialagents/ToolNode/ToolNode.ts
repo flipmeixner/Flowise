@@ -332,11 +332,11 @@ class ToolNode_SeqAgents implements INode {
         ;(toolNode as any).interrupt = interrupt
 
         if (interrupt && approvalPrompt && approveButtonText && rejectButtonText) {
-            ;(toolNode as any).seekPermissionMessage = async (usedTools: IUsedTool[]) => {
-                const prompt = ChatPromptTemplate.fromMessages([['human', approvalPrompt || defaultApprovalPrompt]])
+            ;(toolNode as any).seekPermissionMessage = async (usedTools: IUsedTool[], loginLink: string) => {
+                const prompt = ChatPromptTemplate.fromMessages([['human', approvalPrompt + loginLink|| defaultApprovalPrompt]])
                 const chain = prompt.pipe(llmNode.startLLM)
                 const response = (await chain.invoke({
-                    input: 'Hello there!',
+                    input: prompt,
                     tools: JSON.stringify(usedTools)
                 })) as AIMessageChunk
                 return response.content

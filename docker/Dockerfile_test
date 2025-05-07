@@ -1,0 +1,20 @@
+# Use Node.js 18 base image
+FROM node:18
+
+# Set working directory
+WORKDIR /app
+
+# Copy all local source code into the container
+COPY . .
+
+# Install dependencies
+RUN npm install -g pnpm && pnpm install
+
+# Build the TypeScript project
+RUN pnpm run build
+
+# Expose the port Flowise uses
+EXPOSE 3000
+
+# Run Flowise
+CMD ["pnpm", "start"]
