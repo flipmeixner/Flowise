@@ -62,7 +62,8 @@ class GoogleGenerativeAI_ChatModels implements INode {
                 type: 'string',
                 placeholder: 'gemini-1.5-pro-exp-0801',
                 description: 'Custom model name to use. If provided, it will override the model selected',
-                additionalParams: true
+                additionalParams: true,
+                optional: true
             },
             {
                 label: 'Temperature',
@@ -215,6 +216,10 @@ class GoogleGenerativeAI_ChatModels implements INode {
             streaming: streaming ?? true
         }
 
+        // this extra metadata is needed, as langchain does not show the model name in the callbacks.
+        obj.metadata = {
+            fw_model_name: customModelName || modelName
+        }
         if (maxOutputTokens) obj.maxOutputTokens = parseInt(maxOutputTokens, 10)
         if (topP) obj.topP = parseFloat(topP)
         if (topK) obj.topK = parseFloat(topK)
